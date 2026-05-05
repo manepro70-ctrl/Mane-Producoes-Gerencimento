@@ -1,0 +1,917 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #F0D080;
+    --gold-dark: #8B6914;
+    --charcoal: #1A1A1A;
+    --charcoal-2: #242424;
+    --charcoal-3: #2E2E2E;
+    --charcoal-4: #383838;
+    --silver: #9A9A9A;
+    --silver-light: #C8C8C8;
+    --white: #F5F3EE;
+    --red: #E05050;
+    --green: #4CAF82;
+    --orange: #E07840;
+    --blue: #5080D0;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--charcoal); color: var(--white); min-height: 100vh; overflow-x: hidden; }
+
+  .app { display: flex; min-height: 100vh; }
+
+  .sidebar { width: 220px; min-width: 220px; background: var(--charcoal-2); border-right: 1px solid #333; display: flex; flex-direction: column; padding: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+
+  .logo { padding: 20px 16px 16px; border-bottom: 1px solid #333; }
+  .logo-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; color: var(--gold); line-height: 1; }
+  .logo-sub { font-size: 10px; color: var(--silver); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+
+  .nav { padding: 12px 8px; flex: 1; }
+  .nav-section { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--silver); padding: 12px 8px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--silver-light); transition: all 0.15s; margin-bottom: 1px; border: none; background: none; width: 100%; text-align: left; }
+  .nav-item:hover { background: var(--charcoal-3); color: var(--white); }
+  .nav-item.active { background: rgba(201,168,76,0.15); color: var(--gold); border-left: 2px solid var(--gold); }
+  .nav-icon { font-size: 14px; width: 18px; text-align: center; }
+
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar { background: var(--charcoal-2); border-bottom: 1px solid #333; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .page-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--white); }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+  .btn { padding: 7px 14px; border-radius: 7px; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; }
+  .btn-gold { background: var(--gold); color: var(--charcoal); }
+  .btn-gold:hover { background: var(--gold-light); }
+  .btn-outline { background: transparent; color: var(--silver-light); border: 1px solid #444; }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+  .content { padding: 20px 24px; flex: 1; overflow-y: auto; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .kpi-card { background: var(--charcoal-2); border: 1px solid #333; border-radius: 12px; padding: 16px; position: relative; overflow: hidden; }
+  .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gold); }
+  .kpi-card.danger::before { background: var(--red); }
+  .kpi-card.success::before { background: var(--green); }
+  .kpi-card.warn::before { background: var(--orange); }
+  .kpi-label { font-size: 11px; color: var(--silver); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .kpi-value { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px; color: var(--white); line-height: 1; }
+  .kpi-sub { font-size: 11px; color: var(--silver); margin-top: 4px; }
+  .kpi-icon { position: absolute; right: 14px; top: 14px; font-size: 22px; opacity: 0.3; }
+
+  .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .card { background: var(--charcoal-2); border: 1px solid #333; border-radius: 12px; overflow: hidden; }
+  .card-header { padding: 14px 16px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--white); }
+  .card-body { padding: 14px 16px; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { text-align: left; padding: 10px 12px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--silver); border-bottom: 1px solid #333; background: var(--charcoal-3); white-space: nowrap; }
+  td { padding: 10px 12px; border-bottom: 1px solid #2A2A2A; color: var(--silver-light); vertical-align: middle; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  tr:last-child td { border-bottom: none; }
+
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-green { background: rgba(76,175,130,0.15); color: #4CAF82; }
+  .badge-red { background: rgba(224,80,80,0.15); color: #E05050; }
+  .badge-orange { background: rgba(224,120,64,0.15); color: #E07840; }
+  .badge-blue { background: rgba(80,128,208,0.15); color: #5080D0; }
+  .badge-gold { background: rgba(201,168,76,0.15); color: #C9A84C; }
+  .badge-gray { background: rgba(154,154,154,0.15); color: #9A9A9A; }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--charcoal-2); border: 1px solid #444; border-radius: 16px; width: 600px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+  .modal-header { padding: 18px 20px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
+  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--gold); }
+  .modal-close { background: none; border: none; color: var(--silver); font-size: 20px; cursor: pointer; line-height: 1; }
+  .modal-body { padding: 20px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-full { grid-column: 1 / -1; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11px; font-weight: 600; color: var(--silver); text-transform: uppercase; letter-spacing: 0.8px; }
+  .field input, .field select, .field textarea { background: var(--charcoal-3); border: 1px solid #444; border-radius: 8px; padding: 9px 12px; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; transition: border-color 0.15s; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--gold); }
+  .field textarea { resize: vertical; min-height: 72px; }
+  .field select option { background: var(--charcoal-3); }
+
+  .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 16px; border-top: 1px solid #333; }
+
+  .toolbar { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
+  .search-box { flex: 1; min-width: 200px; background: var(--charcoal-2); border: 1px solid #333; border-radius: 8px; padding: 8px 12px; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; }
+  .search-box:focus { outline: none; border-color: var(--gold); }
+  .filter-select { background: var(--charcoal-2); border: 1px solid #333; border-radius: 8px; padding: 8px 10px; color: var(--silver-light); font-family: 'DM Sans', sans-serif; font-size: 12px; }
+  .filter-select:focus { outline: none; border-color: var(--gold); }
+
+  .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .cal-nav { background: var(--charcoal-3); border: 1px solid #444; border-radius: 6px; padding: 5px 10px; color: var(--white); cursor: pointer; font-size: 13px; }
+  .cal-month { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; color: var(--gold); }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-day-header { text-align: center; font-size: 10px; font-weight: 600; color: var(--silver); padding: 6px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+  .cal-cell { background: var(--charcoal-3); border: 1px solid #2A2A2A; border-radius: 6px; min-height: 72px; padding: 6px; cursor: pointer; transition: border-color 0.15s; position: relative; }
+  .cal-cell:hover { border-color: #555; }
+  .cal-cell.other-month { opacity: 0.35; }
+  .cal-cell.today { border-color: var(--gold); }
+  .cal-date { font-size: 11px; font-weight: 500; color: var(--silver); margin-bottom: 3px; }
+  .cal-cell.today .cal-date { color: var(--gold); font-weight: 700; }
+  .cal-event { font-size: 9px; padding: 2px 5px; border-radius: 3px; margin-bottom: 2px; background: rgba(201,168,76,0.2); color: var(--gold-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cal-event.blue { background: rgba(80,128,208,0.2); color: #7AAAF0; }
+  .cal-event.green { background: rgba(76,175,130,0.2); color: #6DD4A8; }
+  .cal-event.red { background: rgba(224,80,80,0.2); color: #F08080; }
+
+  .progress-bar-wrap { background: #333; border-radius: 100px; height: 6px; margin-top: 6px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 100px; background: var(--gold); transition: width 0.4s; }
+
+  .days-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .days-ok { background: rgba(76,175,130,0.15); color: #4CAF82; }
+  .days-warn { background: rgba(224,120,64,0.15); color: #E07840; }
+  .days-late { background: rgba(224,80,80,0.15); color: #E05050; }
+  .days-done { background: rgba(154,154,154,0.15); color: #9A9A9A; }
+
+  .mini-chart { display: flex; align-items: flex-end; gap: 5px; height: 60px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar-fill { width: 100%; border-radius: 4px 4px 0 0; background: rgba(201,168,76,0.4); transition: height 0.3s; min-height: 4px; }
+  .bar-label { font-size: 9px; color: var(--silver); white-space: nowrap; }
+
+  .activity-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #2A2A2A; }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .activity-text { font-size: 12px; color: var(--silver-light); line-height: 1.5; }
+  .activity-time { font-size: 10px; color: var(--silver); margin-top: 2px; }
+
+  .detail-row { display: flex; padding: 9px 0; border-bottom: 1px solid #2A2A2A; }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-label { font-size: 11px; color: var(--silver); width: 150px; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+  .detail-value { font-size: 13px; color: var(--white); }
+
+  .pdf-preview { background: #fff; color: #111; border-radius: 10px; padding: 32px 36px; font-family: 'DM Sans', sans-serif; max-width: 520px; margin: 0 auto; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+  .pdf-logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px; color: var(--gold-dark); }
+  .pdf-divider { border: none; border-top: 2px solid var(--gold-dark); margin: 14px 0; opacity: 0.4; }
+  .pdf-row { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 1px solid #eee; }
+  .pdf-row-label { color: #555; }
+  .pdf-row-value { font-weight: 500; }
+  .pdf-total { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; padding: 10px 0; border-top: 2px solid var(--gold-dark); margin-top: 8px; color: var(--gold-dark); }
+  .pdf-footer { text-align: center; font-size: 10px; color: #bbb; margin-top: 28px; }
+
+  @media (max-width: 800px) {
+    .kpi-grid { grid-template-columns: repeat(2,1fr); }
+    .dash-grid { grid-template-columns: 1fr; }
+    .sidebar { width: 56px; min-width: 56px; }
+    .sidebar .logo-title, .sidebar .logo-sub, .sidebar .nav-section, .nav-item span { display: none; }
+    .nav-item { justify-content: center; padding: 10px; }
+    .nav-icon { width: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <nav class="sidebar">
+    <div class="logo">
+      <div class="logo-title">CINEGEST</div>
+      <div class="logo-sub">Produtora · GW</div>
+    </div>
+    <div class="nav">
+      <div class="nav-section">Principal</div>
+      <button class="nav-item active" onclick="nav('dashboard',this)"><span class="nav-icon">📊</span><span>Dashboard</span></button>
+      <button class="nav-item" onclick="nav('clients',this)"><span class="nav-icon">👥</span><span>Clientes</span></button>
+      <button class="nav-item" onclick="nav('schedule',this)"><span class="nav-icon">📅</span><span>Agendamento</span></button>
+      <div class="nav-section">Projeto</div>
+      <button class="nav-item" onclick="nav('budget',this)"><span class="nav-icon">💰</span><span>Orçamentos</span></button>
+      <button class="nav-item" onclick="nav('production',this)"><span class="nav-icon">🎥</span><span>Produção</span></button>
+      <button class="nav-item" onclick="nav('delivery',this)"><span class="nav-icon">⏳</span><span>Prazos</span></button>
+      <div class="nav-section">Saída</div>
+      <button class="nav-item" onclick="nav('files',this)"><span class="nav-icon">📁</span><span>Entregas</span></button>
+      <button class="nav-item" onclick="nav('quote',this)"><span class="nav-icon">📄</span><span>Orçamento PDF</span></button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title" id="page-title">Dashboard</div>
+      <div class="topbar-actions">
+        <button class="btn btn-outline" onclick="openModal()">+ Novo Projeto</button>
+        <button class="btn btn-gold" onclick="nav('quote',null)">📄 Gerar PDF</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <section id="sec-dashboard" class="section active">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon">🎬</div>
+            <div class="kpi-label">Projetos Ativos</div>
+            <div class="kpi-value" id="kpi-active">0</div>
+            <div class="kpi-sub">em andamento</div>
+          </div>
+          <div class="kpi-card danger">
+            <div class="kpi-icon">⚠️</div>
+            <div class="kpi-label">Atrasados</div>
+            <div class="kpi-value" id="kpi-late">0</div>
+            <div class="kpi-sub">precisam atenção</div>
+          </div>
+          <div class="kpi-card success">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-label">Receita Total</div>
+            <div class="kpi-value" id="kpi-revenue">0</div>
+            <div class="kpi-sub">todos os projetos</div>
+          </div>
+          <div class="kpi-card warn">
+            <div class="kpi-icon">⏳</div>
+            <div class="kpi-label">Pagamentos Pend.</div>
+            <div class="kpi-value" id="kpi-pending">0</div>
+            <div class="kpi-sub">a receber</div>
+          </div>
+        </div>
+        <div class="dash-grid">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Projetos Recentes</span>
+              <button class="btn btn-outline" style="padding:4px 10px;font-size:11px" onclick="nav('clients',document.querySelector('[onclick*=clients]'))">Ver todos</button>
+            </div>
+            <div class="card-body" style="padding:0">
+              <div class="table-wrap">
+                <table id="dash-recent">
+                  <thead><tr><th>Cliente</th><th>Tipo</th><th>Status</th><th>Valor</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Receita por Mês (CFA)</span></div>
+            <div class="card-body">
+              <div class="mini-chart" id="mini-chart"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Próximas Gravações</span></div>
+            <div class="card-body" style="padding:0">
+              <table id="dash-upcoming">
+                <thead><tr><th>Data</th><th>Cliente</th><th>Local</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Atividade Recente</span></div>
+            <div class="card-body" id="activity-feed"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CLIENTES -->
+      <section id="sec-clients" class="section">
+        <div class="toolbar">
+          <input class="search-box" placeholder="🔍  Pesquisar cliente ou projeto…" oninput="filterClients(this.value)" />
+          <select class="filter-select" onchange="filterClientsType(this.value)">
+            <option value="">Todos os tipos</option>
+            <option>Videoclipe</option>
+            <option>Evento</option>
+            <option>Publicidade</option>
+            <option>Conteúdo</option>
+          </select>
+          <select class="filter-select" onchange="filterClientsStatus(this.value)">
+            <option value="">Todos os status</option>
+            <option>Novo</option>
+            <option>Em andamento</option>
+            <option>Finalizado</option>
+          </select>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Cliente</th><th>Contacto</th><th>Tipo</th><th>Status</th><th>Valor</th><th>Pagamento</th><th>Ações</th></tr>
+              </thead>
+              <tbody id="clients-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- AGENDAMENTO -->
+      <section id="sec-schedule" class="section">
+        <div class="calendar-header">
+          <button class="cal-nav" onclick="changeMonth(-1)">&#8249;</button>
+          <div class="cal-month" id="cal-month-label"></div>
+          <button class="cal-nav" onclick="changeMonth(1)">&#8250;</button>
+        </div>
+        <div class="cal-grid" id="calendar"></div>
+        <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+          <span class="badge badge-gold">Videoclipe</span>
+          <span class="badge badge-blue">Evento</span>
+          <span class="badge badge-green">Publicidade</span>
+          <span class="badge badge-red">Conteúdo</span>
+        </div>
+      </section>
+
+      <!-- ORÇAMENTOS -->
+      <section id="sec-budget" class="section">
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Projeto</th><th>Valor Total</th><th>Entrada</th><th>Restante</th><th>Forma Pag.</th><th>Status</th><th>Prog.</th></tr>
+              </thead>
+              <tbody id="budget-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRODUÇÃO -->
+      <section id="sec-production" class="section">
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Projeto</th><th>Tipo Vídeo</th><th>Equipamentos</th><th>Responsável</th><th>Status Grav.</th></tr>
+              </thead>
+              <tbody id="production-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRAZOS -->
+      <section id="sec-delivery" class="section">
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Projeto</th><th>Data Combinada</th><th>Dias Restantes</th><th>Status Prazo</th></tr>
+              </thead>
+              <tbody id="delivery-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ENTREGAS -->
+      <section id="sec-files" class="section">
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Projeto</th><th>Link Final</th><th>Data Entrega Real</th><th>Feedback</th></tr>
+              </thead>
+              <tbody id="files-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- PDF -->
+      <section id="sec-quote" class="section">
+        <div style="margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <select class="filter-select" id="quote-project-select" onchange="loadQuote()" style="min-width:220px">
+            <option value="">— Selecionar projeto —</option>
+          </select>
+          <button class="btn btn-gold" onclick="printQuote()">🖨️ Imprimir / Salvar PDF</button>
+        </div>
+        <div id="quote-area"></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">NOVO PROJETO</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field form-full">
+          <label>Nome do Cliente *</label>
+          <input id="f-name" type="text" placeholder="Ex: Mamadú Baldé" />
+        </div>
+        <div class="field">
+          <label>Contacto / WhatsApp</label>
+          <input id="f-phone" type="text" placeholder="+245 9XX XXX XXX" />
+        </div>
+        <div class="field">
+          <label>Tipo de Projeto</label>
+          <select id="f-type">
+            <option>Videoclipe</option>
+            <option>Evento</option>
+            <option>Publicidade</option>
+            <option>Conteúdo</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status do Projeto</label>
+          <select id="f-status">
+            <option>Novo</option>
+            <option>Em andamento</option>
+            <option>Finalizado</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Valor Total (CFA)</label>
+          <input id="f-value" type="number" placeholder="0" />
+        </div>
+        <div class="field">
+          <label>Entrada Paga (CFA)</label>
+          <input id="f-entry" type="number" placeholder="0" />
+        </div>
+        <div class="field">
+          <label>Forma de Pagamento</label>
+          <select id="f-payment">
+            <option>Orange Money</option>
+            <option>MTN Money</option>
+            <option>Transferência Bancária</option>
+            <option>Dinheiro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status do Pagamento</label>
+          <select id="f-payStatus">
+            <option>Pendente</option>
+            <option>Parcial</option>
+            <option>Pago</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Data da Gravação</label>
+          <input id="f-recDate" type="date" />
+        </div>
+        <div class="field">
+          <label>Hora</label>
+          <input id="f-recTime" type="time" />
+        </div>
+        <div class="field">
+          <label>Local</label>
+          <input id="f-location" type="text" placeholder="Ex: Bissau, Bairro de Quelele" />
+        </div>
+        <div class="field">
+          <label>Responsável</label>
+          <input id="f-owner" type="text" placeholder="Ex: Idrissa Camará" />
+        </div>
+        <div class="field">
+          <label>Equipamentos</label>
+          <input id="f-equip" type="text" placeholder="Ex: Sony A7, Drone, LED" />
+        </div>
+        <div class="field">
+          <label>Data de Entrega</label>
+          <input id="f-deadline" type="date" />
+        </div>
+        <div class="field">
+          <label>Status da Gravação</label>
+          <select id="f-recStatus">
+            <option>Não iniciada</option>
+            <option>Em gravação</option>
+            <option>Concluída</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Link do Vídeo Final</label>
+          <input id="f-link" type="text" placeholder="drive.google.com/…" />
+        </div>
+        <div class="field form-full">
+          <label>Feedback do Cliente</label>
+          <textarea id="f-feedback" placeholder="Observações do cliente…"></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-gold" onclick="saveProject()">Salvar Projeto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DADOS DE EXEMPLO (Guiné-Bissau) ───
+let projects = [
+  {
+    id:1, name:'Dulce na Bianda', phone:'+245 955 123 456', type:'Videoclipe',
+    status:'Em andamento', value:850000, entry:300000, payment:'Orange Money', payStatus:'Parcial',
+    recDate:'2025-05-12', recTime:'09:00', location:'Bissau — Bairro de Quelele', owner:'Idrissa Camará',
+    equip:'Sony A7III, Drone DJI, LED Panel', deadline:'2025-05-28', recStatus:'Em gravação',
+    link:'', feedback:''
+  },
+  {
+    id:2, name:'Gana Moda Bissau', phone:'+245 966 234 567', type:'Publicidade',
+    status:'Em andamento', value:1500000, entry:750000, payment:'Transferência Bancária', payStatus:'Parcial',
+    recDate:'2025-05-08', recTime:'08:00', location:'Av. Domingos Ramos, Bissau', owner:'Fátima Djalo',
+    equip:'RED Cinema, Gimbal, Caixa Difusora', deadline:'2025-05-20', recStatus:'Concluída',
+    link:'https://drive.google.com/share/gana-moda', feedback:'Cliente ficou muito satisfeito!'
+  },
+  {
+    id:3, name:'MC Gasolina', phone:'+245 977 345 678', type:'Videoclipe',
+    status:'Novo', value:600000, entry:0, payment:'Orange Money', payStatus:'Pendente',
+    recDate:'2025-05-22', recTime:'15:00', location:'Praia de Quinhamel', owner:'Braima Có',
+    equip:'Sony A7III, Steadicam, Smoke Machine', deadline:'2025-06-10', recStatus:'Não iniciada',
+    link:'', feedback:''
+  },
+  {
+    id:4, name:'Festival Pindjiguiti', phone:'+245 944 456 789', type:'Evento',
+    status:'Finalizado', value:1200000, entry:1200000, payment:'Dinheiro', payStatus:'Pago',
+    recDate:'2025-04-25', recTime:'18:00', location:'Cais de Pindjiguiti, Bissau', owner:'Mariama Sow',
+    equip:'Sony FX3 x2, Drone, Teleprompter', deadline:'2025-05-05', recStatus:'Concluída',
+    link:'https://drive.google.com/share/pindjiguiti', feedback:'Trabalho excelente! 5 estrelas'
+  },
+  {
+    id:5, name:'Supermercado Corubal', phone:'+245 933 567 890', type:'Publicidade',
+    status:'Em andamento', value:2000000, entry:800000, payment:'MTN Money', payStatus:'Parcial',
+    recDate:'2025-05-03', recTime:'07:00', location:'Studio Central, Bissau', owner:'Idrissa Camará',
+    equip:'ARRI Alexa, HMI Lights, Drone', deadline:'2025-05-15', recStatus:'Concluída',
+    link:'', feedback:''
+  },
+];
+
+let calYear = 2025, calMonth = 4;
+const MONTHS_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DAYS_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+// ─── MOEDA CFA ───
+function fmt(v) {
+  return Number(v).toLocaleString('fr-FR') + ' CFA';
+}
+
+// ─── NAV ───
+function nav(sec, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('sec-'+sec).classList.add('active');
+  if (el) el.classList.add('active');
+  const titles = {dashboard:'Dashboard',clients:'Gestão de Clientes',schedule:'Agendamento',budget:'Orçamentos',production:'Produção',delivery:'Prazos de Entrega',files:'Entregas',quote:'Orçamento PDF'};
+  document.getElementById('page-title').textContent = titles[sec] || sec;
+  if (sec==='dashboard') renderDashboard();
+  if (sec==='clients') renderClients();
+  if (sec==='schedule') renderCalendar();
+  if (sec==='budget') renderBudget();
+  if (sec==='production') renderProduction();
+  if (sec==='delivery') renderDelivery();
+  if (sec==='files') renderFiles();
+  if (sec==='quote') renderQuoteSelect();
+}
+
+// ─── MODAL ───
+function openModal() { document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+function saveProject() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('Informe o nome do cliente.'); return; }
+  const p = {
+    id: Date.now(),
+    name, phone: document.getElementById('f-phone').value,
+    type: document.getElementById('f-type').value, status: document.getElementById('f-status').value,
+    value: parseFloat(document.getElementById('f-value').value)||0,
+    entry: parseFloat(document.getElementById('f-entry').value)||0,
+    payment: document.getElementById('f-payment').value, payStatus: document.getElementById('f-payStatus').value,
+    recDate: document.getElementById('f-recDate').value, recTime: document.getElementById('f-recTime').value,
+    location: document.getElementById('f-location').value, owner: document.getElementById('f-owner').value,
+    equip: document.getElementById('f-equip').value, deadline: document.getElementById('f-deadline').value,
+    recStatus: document.getElementById('f-recStatus').value, link: document.getElementById('f-link').value,
+    feedback: document.getElementById('f-feedback').value
+  };
+  projects.unshift(p);
+  closeModal();
+  addActivity('Novo projeto criado: ' + p.name + ' — ' + p.type, '#C9A84C');
+}
+
+// ─── HELPERS ───
+function daysLeft(d) {
+  if (!d) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const dl = new Date(d+'T00:00:00');
+  return Math.round((dl-today)/(1000*60*60*24));
+}
+function statusBadge(s) {
+  const map = {'Novo':'badge-blue','Em andamento':'badge-gold','Finalizado':'badge-green'};
+  return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
+}
+function payBadge(s) {
+  const map = {'Pendente':'badge-red','Parcial':'badge-orange','Pago':'badge-green'};
+  return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
+}
+function typeBadge(t) {
+  const map = {'Videoclipe':'badge-gold','Evento':'badge-blue','Publicidade':'badge-green','Conteúdo':'badge-red'};
+  return `<span class="badge ${map[t]||'badge-gray'}">${t}</span>`;
+}
+function recBadge(s) {
+  const map = {'Não iniciada':'badge-gray','Em gravação':'badge-orange','Concluída':'badge-green'};
+  return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
+}
+
+let activities = [
+  {msg:'Entrega realizada: Festival Pindjiguiti — Evento', color:'#4CAF82', time:'Ontem'},
+  {msg:'Pagamento recebido: Gana Moda Bissau — 750.000 CFA', color:'#C9A84C', time:'2 dias atrás'},
+  {msg:'Gravação concluída: Supermercado Corubal', color:'#5080D0', time:'3 dias atrás'},
+];
+function addActivity(msg, color) {
+  activities.unshift({msg, color, time:'Agora'});
+  if (activities.length>10) activities.pop();
+  renderDashboard();
+}
+
+// ─── DASHBOARD ───
+function renderDashboard() {
+  const active = projects.filter(p=>p.status!=='Finalizado').length;
+  const late = projects.filter(p=>{
+    if (p.status==='Finalizado') return false;
+    const d = daysLeft(p.deadline);
+    return d!==null && d<0;
+  }).length;
+  const revenue = projects.reduce((a,p)=>a+p.value,0);
+  const pending = projects.reduce((a,p)=>a+(p.value-p.entry),0);
+
+  document.getElementById('kpi-active').textContent = active;
+  document.getElementById('kpi-late').textContent = late;
+  document.getElementById('kpi-revenue').textContent = fmt(revenue);
+  document.getElementById('kpi-pending').textContent = fmt(pending);
+
+  document.querySelector('#dash-recent tbody').innerHTML = projects.slice(0,5).map(p=>`
+    <tr>
+      <td style="color:var(--white);font-weight:500">${p.name}</td>
+      <td>${typeBadge(p.type)}</td>
+      <td>${statusBadge(p.status)}</td>
+      <td style="color:var(--gold);white-space:nowrap">${fmt(p.value)}</td>
+    </tr>`).join('');
+
+  const up = projects.filter(p=>p.recDate && daysLeft(p.recDate)>=0).sort((a,b)=>a.recDate.localeCompare(b.recDate));
+  document.querySelector('#dash-upcoming tbody').innerHTML = up.slice(0,5).map(p=>{
+    const d = new Date(p.recDate+'T00:00:00');
+    return `<tr><td>${d.toLocaleDateString('pt-PT')}</td><td style="color:var(--white)">${p.name}</td><td>${p.location||'—'}</td></tr>`;
+  }).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--silver);padding:20px">Nenhuma gravação agendada</td></tr>';
+
+  document.getElementById('activity-feed').innerHTML = activities.map(a=>`
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${a.color}"></div>
+      <div><div class="activity-text">${a.msg}</div><div class="activity-time">${a.time}</div></div>
+    </div>`).join('');
+
+  const months = ['Jan','Fev','Mar','Abr','Mai','Jun'];
+  const vals = [320000,580000,410000,920000,740000,610000];
+  const max = Math.max(...vals);
+  document.getElementById('mini-chart').innerHTML = months.map((m,i)=>`
+    <div class="bar-col">
+      <div class="bar-fill" style="height:${(vals[i]/max*52)}px;background:${i===4?'var(--gold)':'rgba(201,168,76,0.35)'}"></div>
+      <span class="bar-label">${m}</span>
+    </div>`).join('');
+}
+
+// ─── CLIENTES ───
+let clientFilter='', clientTypeFilter='', clientStatusFilter='';
+function filterClients(v) { clientFilter=v.toLowerCase(); renderClients(); }
+function filterClientsType(v) { clientTypeFilter=v; renderClients(); }
+function filterClientsStatus(v) { clientStatusFilter=v; renderClients(); }
+
+function renderClients() {
+  const filtered = projects.filter(p=>{
+    const m = !clientFilter || p.name.toLowerCase().includes(clientFilter) || p.type.toLowerCase().includes(clientFilter);
+    const t = !clientTypeFilter || p.type===clientTypeFilter;
+    const s = !clientStatusFilter || p.status===clientStatusFilter;
+    return m&&t&&s;
+  });
+  document.getElementById('clients-table').innerHTML = filtered.map(p=>`
+    <tr>
+      <td style="color:var(--white);font-weight:500">${p.name}</td>
+      <td>${p.phone||'—'}</td>
+      <td>${typeBadge(p.type)}</td>
+      <td>${statusBadge(p.status)}</td>
+      <td style="color:var(--gold);white-space:nowrap">${fmt(p.value)}</td>
+      <td>${payBadge(p.payStatus)}</td>
+      <td><button class="btn btn-outline" style="padding:3px 9px;font-size:10px" onclick="showDetail(${p.id})">Ver</button></td>
+    </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--silver);padding:20px">Nenhum projeto encontrado</td></tr>';
+}
+
+function showDetail(id) {
+  const p = projects.find(x=>x.id===id); if(!p) return;
+  const dl = daysLeft(p.deadline);
+  const dlChip = dl===null?'—': dl<0?`<span class="days-chip days-late">⚠ ${Math.abs(dl)}d atrasado</span>`:dl===0?`<span class="days-chip days-warn">Hoje!</span>`:`<span class="days-chip days-ok">${dl}d restantes</span>`;
+  const d = document.createElement('div');
+  d.innerHTML = `
+  <div class="modal-overlay open" onclick="this.remove()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">${p.name}</span>
+        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-row"><span class="detail-label">Tipo</span><span class="detail-value">${typeBadge(p.type)}</span></div>
+        <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${statusBadge(p.status)}</span></div>
+        <div class="detail-row"><span class="detail-label">Contacto</span><span class="detail-value">${p.phone||'—'}</span></div>
+        <div class="detail-row"><span class="detail-label">Valor Total</span><span class="detail-value" style="color:var(--gold);font-weight:600">${fmt(p.value)}</span></div>
+        <div class="detail-row"><span class="detail-label">Entrada</span><span class="detail-value">${fmt(p.entry)}</span></div>
+        <div class="detail-row"><span class="detail-label">Restante</span><span class="detail-value" style="color:var(--orange)">${fmt(p.value-p.entry)}</span></div>
+        <div class="detail-row"><span class="detail-label">Pagamento</span><span class="detail-value">${payBadge(p.payStatus)} — ${p.payment}</span></div>
+        <div class="detail-row"><span class="detail-label">Gravação</span><span class="detail-value">${p.recDate?new Date(p.recDate+'T00:00:00').toLocaleDateString('pt-PT'):'—'} ${p.recTime||''} — ${p.location||''}</span></div>
+        <div class="detail-row"><span class="detail-label">Responsável</span><span class="detail-value">${p.owner||'—'}</span></div>
+        <div class="detail-row"><span class="detail-label">Equipamentos</span><span class="detail-value">${p.equip||'—'}</span></div>
+        <div class="detail-row"><span class="detail-label">Prazo</span><span class="detail-value">${p.deadline?new Date(p.deadline+'T00:00:00').toLocaleDateString('pt-PT'):'—'} ${dlChip}</span></div>
+        <div class="detail-row"><span class="detail-label">Status Grav.</span><span class="detail-value">${recBadge(p.recStatus)}</span></div>
+        ${p.link?`<div class="detail-row"><span class="detail-label">Link Final</span><span class="detail-value"><a href="${p.link}" target="_blank" style="color:var(--gold)">${p.link}</a></span></div>`:''}
+        ${p.feedback?`<div class="detail-row"><span class="detail-label">Feedback</span><span class="detail-value">${p.feedback}</span></div>`:''}
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(d);
+}
+
+// ─── CALENDÁRIO ───
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth>11){calMonth=0;calYear++;}
+  if (calMonth<0){calMonth=11;calYear--;}
+  renderCalendar();
+}
+function renderCalendar() {
+  document.getElementById('cal-month-label').textContent = MONTHS_PT[calMonth]+' '+calYear;
+  const first = new Date(calYear,calMonth,1).getDay();
+  const last = new Date(calYear,calMonth+1,0).getDate();
+  const prevLast = new Date(calYear,calMonth,0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const typeColors = {Videoclipe:'',Evento:'blue',Publicidade:'green',Conteúdo:'red'};
+
+  let html = DAYS_PT.map(d=>`<div class="cal-day-header">${d}</div>`).join('');
+  let cells = [];
+  for(let i=0;i<first;i++) cells.push({day:prevLast-first+1+i,other:true});
+  for(let d=1;d<=last;d++) cells.push({day:d,other:false});
+  while(cells.length%7!==0) cells.push({day:cells.length-last-first+1,other:true});
+
+  html += cells.map(c=>{
+    const dt=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(c.day).padStart(2,'0')}`;
+    const isToday=!c.other&&new Date(calYear,calMonth,c.day).getTime()===today.getTime();
+    const events=c.other?[]:projects.filter(p=>p.recDate===dt);
+    return `<div class="cal-cell${c.other?' other-month':''}${isToday?' today':''}">
+      <div class="cal-date">${c.day}</div>
+      ${events.map(e=>`<div class="cal-event ${typeColors[e.type]||''}">${e.name}</div>`).join('')}
+    </div>`;
+  }).join('');
+  document.getElementById('calendar').innerHTML = html;
+}
+
+// ─── ORÇAMENTOS ───
+function renderBudget() {
+  document.getElementById('budget-table').innerHTML = projects.map(p=>{
+    const rest=p.value-p.entry;
+    const pct=p.value>0?Math.round((p.entry/p.value)*100):0;
+    return `<tr>
+      <td style="color:var(--white);font-weight:500">${p.name} <span style="font-size:10px;color:var(--silver)">(${p.type})</span></td>
+      <td style="color:var(--gold);white-space:nowrap">${fmt(p.value)}</td>
+      <td style="white-space:nowrap">${fmt(p.entry)}</td>
+      <td style="color:${rest>0?'var(--orange)':'var(--green)'};white-space:nowrap">${fmt(rest)}</td>
+      <td>${p.payment}</td>
+      <td>${payBadge(p.payStatus)}</td>
+      <td style="min-width:100px">
+        <div style="font-size:10px;color:var(--silver);margin-bottom:3px">${pct}%</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:${pct}%;background:${pct>=100?'var(--green)':pct>=50?'var(--gold)':'var(--red)'}"></div></div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── PRODUÇÃO ───
+function renderProduction() {
+  document.getElementById('production-table').innerHTML = projects.map(p=>`
+    <tr>
+      <td style="color:var(--white);font-weight:500">${p.name}</td>
+      <td>${typeBadge(p.type)}</td>
+      <td style="font-size:11px;color:var(--silver-light)">${p.equip||'—'}</td>
+      <td>${p.owner||'—'}</td>
+      <td>${recBadge(p.recStatus)}</td>
+    </tr>`).join('');
+}
+
+// ─── PRAZOS ───
+function renderDelivery() {
+  document.getElementById('delivery-table').innerHTML = projects.map(p=>{
+    const dl=daysLeft(p.deadline);
+    let chip,chipClass;
+    if(p.status==='Finalizado'||p.link){chip='Entregue';chipClass='days-done';}
+    else if(dl===null){chip='Sem data';chipClass='days-done';}
+    else if(dl<0){chip=`${Math.abs(dl)}d atrasado`;chipClass='days-late';}
+    else if(dl<=3){chip=`${dl}d — Urgente`;chipClass='days-warn';}
+    else{chip=`${dl} dias`;chipClass='days-ok';}
+    const dlBadge=dl!==null&&dl<0&&p.status!=='Finalizado'&&!p.link?'<span class="badge badge-red">ATRASADO</span>':p.link?'<span class="badge badge-green">Entregue</span>':dl!==null&&dl<=3?'<span class="badge badge-orange">Urgente</span>':'<span class="badge badge-gold">No Prazo</span>';
+    return `<tr style="${dl!==null&&dl<0&&p.status!=='Finalizado'?'background:rgba(224,80,80,0.04)':''}">
+      <td style="color:var(--white);font-weight:500">${p.name} <span style="font-size:10px;color:var(--silver)">${p.type}</span></td>
+      <td>${p.deadline?new Date(p.deadline+'T00:00:00').toLocaleDateString('pt-PT'):'—'}</td>
+      <td><span class="days-chip ${chipClass}">${chip}</span></td>
+      <td>${dlBadge}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── ENTREGAS ───
+function renderFiles() {
+  document.getElementById('files-table').innerHTML = projects.map(p=>`
+    <tr>
+      <td style="color:var(--white);font-weight:500">${p.name}</td>
+      <td>${p.link?`<a href="${p.link}" target="_blank" style="color:var(--gold);font-size:12px">📎 Ver vídeo</a>`:'<span style="color:var(--silver)">Pendente</span>'}</td>
+      <td>${p.link?new Date().toLocaleDateString('pt-PT'):'—'}</td>
+      <td style="font-size:12px;color:var(--silver-light)">${p.feedback||'—'}</td>
+    </tr>`).join('');
+}
+
+// ─── PDF ───
+function renderQuoteSelect() {
+  const sel=document.getElementById('quote-project-select');
+  sel.innerHTML='<option value="">— Selecionar projeto —</option>'+projects.map(p=>`<option value="${p.id}">${p.name} — ${p.type}</option>`).join('');
+  document.getElementById('quote-area').innerHTML='<div style="color:var(--silver);text-align:center;padding:40px">Selecione um projeto para gerar o orçamento</div>';
+}
+
+function loadQuote() {
+  const id=parseInt(document.getElementById('quote-project-select').value);
+  if(!id){renderQuoteSelect();return;}
+  const p=projects.find(x=>x.id===id); if(!p) return;
+  const rest=p.value-p.entry;
+  const today=new Date().toLocaleDateString('pt-PT');
+  document.getElementById('quote-area').innerHTML=`
+  <div class="pdf-preview" id="pdf-content">
+    <div class="pdf-header">
+      <div>
+        <div class="pdf-logo">CINEGEST</div>
+        <div style="font-size:11px;color:#888;margin-top:2px">Produtora de Vídeo · Guiné-Bissau</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:#555;font-weight:500">PROPOSTA DE ORÇAMENTO</div>
+        <div style="font-size:11px;color:#999;margin-top:2px">Data: ${today}</div>
+        <div style="font-size:11px;color:#999">Ref: #${p.id}</div>
+      </div>
+    </div>
+    <hr class="pdf-divider">
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Cliente</div>
+      <div style="font-size:15px;font-weight:600;color:#111">${p.name}</div>
+      <div style="font-size:12px;color:#555">${p.phone||''}</div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Detalhes do Projeto</div>
+      <div class="pdf-row"><span class="pdf-row-label">Tipo</span><span class="pdf-row-value">${p.type}</span></div>
+      <div class="pdf-row"><span class="pdf-row-label">Data da gravação</span><span class="pdf-row-value">${p.recDate?new Date(p.recDate+'T00:00:00').toLocaleDateString('pt-PT'):'—'} ${p.recTime||''}</span></div>
+      <div class="pdf-row"><span class="pdf-row-label">Local</span><span class="pdf-row-value">${p.location||'—'}</span></div>
+      <div class="pdf-row"><span class="pdf-row-label">Responsável</span><span class="pdf-row-value">${p.owner||'—'}</span></div>
+      <div class="pdf-row"><span class="pdf-row-label">Equipamentos</span><span class="pdf-row-value">${p.equip||'—'}</span></div>
+      <div class="pdf-row"><span class="pdf-row-label">Prazo de entrega</span><span class="pdf-row-value">${p.deadline?new Date(p.deadline+'T00:00:00').toLocaleDateString('pt-PT'):'—'}</span></div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Valores</div>
+      <div class="pdf-row"><span class="pdf-row-label">Valor total</span><span class="pdf-row-value">${fmt(p.value)}</span></div>
+      <div class="pdf-row"><span class="pdf-row-label">Entrada recebida</span><span class="pdf-row-value" style="color:#2a7a50">${fmt(p.entry)}</span></div>
+      <div class="pdf-row"><span class="pdf-row-label">Forma de pagamento</span><span class="pdf-row-value">${p.payment}</span></div>
+    </div>
+    <div class="pdf-total">
+      <span>SALDO RESTANTE</span>
+      <span>${fmt(rest)}</span>
+    </div>
+    <div class="pdf-footer">
+      Obrigado pela confiança · CINEGEST Produtora de Vídeo · Guiné-Bissau · Orçamento válido por 15 dias
+    </div>
+  </div>`;
+}
+
+function printQuote() {
+  const el=document.getElementById('pdf-content');
+  if(!el){alert('Selecione um projeto primeiro.');return;}
+  const w=window.open('','_blank');
+  w.document.write(`<html><head><title>Orçamento CFA</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'DM Sans',sans-serif;background:#f5f5f5;display:flex;justify-content:center;padding:40px}
+    @media print{body{background:#fff;padding:0}}
+    .pdf-preview{background:#fff;border-radius:10px;padding:32px 36px;max-width:520px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.1)}
+    .pdf-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}
+    .pdf-logo{font-size:24px;letter-spacing:3px;color:#8B6914;font-weight:700}
+    .pdf-divider{border:none;border-top:2px solid #C9A84C;margin:14px 0;opacity:.4}
+    .pdf-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid #eee}
+    .pdf-row-label{color:#555}
+    .pdf-row-value{font-weight:500}
+    .pdf-total{display:flex;justify-content:space-between;font-size:14px;font-weight:700;padding:10px 0;border-top:2px solid #C9A84C;margin-top:8px;color:#8B6914}
+    .pdf-footer{text-align:center;font-size:10px;color:#bbb;margin-top:28px}
+  </style></head><body>${el.outerHTML}</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),600);
+}
+
+// ─── INIT ───
+renderDashboard();
+</script>
+</body>
+</html>
